@@ -1,2 +1,5 @@
 import express from 'express';import cors from 'cors';import auth from './routes/auth';import customers from './routes/customers';import products from './routes/products';import challans from './routes/challans';import dashboard from './routes/dashboard';import {notFound,errorHandler} from './middleware/error';
-const app=express();app.use(cors({origin:process.env.CORS_ORIGIN?.split(',')||'*'}));app.use(express.json());app.get('/health',(_req,res)=>res.json({status:'ok'}));app.use('/api/auth',auth);app.use('/api/customers',customers);app.use('/api/products',products);app.use('/api/challans',challans);app.use('/api/dashboard',dashboard);app.use(notFound);app.use(errorHandler);export default app;
+const app=express();
+const allowedOrigins=(process.env.CORS_ORIGIN||'*').split(',').map(o=>o.trim());
+app.use(cors({origin:(origin,cb)=>{if(!origin||allowedOrigins.includes('*')||allowedOrigins.includes(origin)){cb(null,true);}else{cb(new Error('Not allowed by CORS'));}},credentials:true}));
+app.use(express.json());app.get('/health',(_req,res)=>res.json({status:'ok'}));app.use('/api/auth',auth);app.use('/api/customers',customers);app.use('/api/products',products);app.use('/api/challans',challans);app.use('/api/dashboard',dashboard);app.use(notFound);app.use(errorHandler);export default app;
